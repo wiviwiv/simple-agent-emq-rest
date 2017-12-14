@@ -20,12 +20,10 @@ router.post('/', function(req, res, next) {
   }
   new Http(data.auth)[data.method.toLowerCase() || 'get'](data.url, data.payload)
     .then((response) => {
-    console.log(1111)
       res.status(response.status || 200)
       res.json(response.data)
     })
     .catch((error) => {
-      console.log(2222)
       res.status(error.response.status || 500)
       res.json({
         message: error.toString(),

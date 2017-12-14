@@ -19,12 +19,12 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 process.on('unhandledRejection', error => {
-  console.log('error')
+  console.warn('error')
 })
 
 // middleware
 app.use(CrosSupport)
-app.use(path.join(config.url_pix || '/api', '*'), apis)
+app.use(config.url_pix || '/api', apis)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

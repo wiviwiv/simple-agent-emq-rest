@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simple-agent-emq-rest</title>
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #f5f5f5;
+    }
+    .box {
+      width: 90%;
+      margin: 100px auto;
+      border-radius: 4px;
+      box-shadow: 0 0 10px #999;
+      padding: 20px;
+    }
+    .box input,textarea {
+      width: 400px;
+      min-height: 24px;
+      display: block;
+      margin: 5px auto;
+    }
+  </style>
+</head>
+<body>
+<div class="box" id="box">
+  <input type="text" v-model="host" placeholder="中间件地址">
+  <input type="text" v-model="data.url" placeholder="完整地址">
+  <input type="text" v-model="data.auth.username" placeholder="用户名">
+  <input type="text" v-model="data.auth.password" placeholder="密码">
+  <input type="text" v-model.trim="data.method" placeholder="方法" :diable="true">
+  <textarea v-model="response" rows="8" placeholder="response"></textarea>
+  <input type="button" value="请求" @click="start">
+</div>
+<script>
+  var host = location.origin + '/api'
+  var vm = new Vue({
+    el: '#box',
+    data: {
+      host: host,
+      data: {
+        url: 'http://ecc.com:18083/api/v2/users',
+        auth: {
+          username: 'admin',
+          password: 'public',
+        },
+        method: 'get',
+      },
+      response: '',
+    },
+    methods: {
+      start: function() {
+        $.ajax({
+          type: "POST",
+          url: vm.host,
+          contentType: "application/json; charset=utf-8",
+          data: JSON.stringify(vm.data),
+          dataType: "json",
+          success: function (message) {
+            vm.response = JSON.stringify(message)
+          },
+          error: function (message) {
+            console.log(message)
+          }
+        })
+      }
+    }
+  })
+</script>
+</body>
+</html>
