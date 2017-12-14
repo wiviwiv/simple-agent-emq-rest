@@ -19,28 +19,55 @@
     }
     .box {
       width: 90%;
-      margin: 100px auto;
+      margin: 20px auto;
       border-radius: 4px;
       box-shadow: 0 0 10px #999;
       padding: 20px;
     }
-    .box input,textarea {
-      width: 400px;
-      min-height: 24px;
+    .box input, button, .text {
+      width: 90%;
+      max-width: 400px;
+      min-height: 32px;
       display: block;
       margin: 5px auto;
+      border-radius: 2px;
+      padding: 2px 10px;
+      border: 1px solid #c9c9c9;
+    }
+    .box textarea {
+      width: 90%;
+      display: block;
+      margin: 20px auto;
+      border-color: transparent;
+      box-shadow: 0 0 4px #999;
+      border-radius: 4px;
+      padding: 4px;
+    }
+    .box select {
+      width: 100px;
+      height: 32px;
+      margin: 5px auto;
+      display: block;
     }
   </style>
 </head>
 <body>
 <div class="box" id="box">
-  <input type="text" v-model="host" placeholder="中间件地址">
-  <input type="text" v-model="data.url" placeholder="完整地址">
+  <input type="text" v-model="host" placeholder="中间件服务地址">
+  <input type="text" v-model="data.url" placeholder="完整地址 http://..">
   <input type="text" v-model="data.auth.username" placeholder="用户名">
   <input type="text" v-model="data.auth.password" placeholder="密码">
-  <input type="text" v-model.trim="data.method" placeholder="方法" :diable="true">
-  <textarea v-model="response" rows="8" placeholder="response"></textarea>
-  <input type="button" value="请求" @click="start">
+  <select v-model="data.method">
+    <option>GET</option>
+    <option disabled>POST</option>
+    <option disabled>PUT</option>
+    <option disabled>DELETE</option>
+  </select>
+  <textarea class="text" v-model="payload" v-if="'POST,PUT'.includes(data.method)" rows="10" placeholder="payloadJSON"></textarea>
+  <button @click="start">请求</button>
+  <textarea v-model="response" v-if="!error" rows="14" placeholder="response"></textarea>
+  <textarea style="color: red" v-model="error" v-else rows="14" placeholder="response"></textarea>
+
 </div>
 <script>
   var host = location.origin + '/api'
@@ -49,17 +76,21 @@
     data: {
       host: host,
       data: {
-        url: 'http://ecc.com:18083/api/v2/users',
+        url: 'http://q.emqtt.com:18083/api/clients',
         auth: {
-          username: 'admin',
-          password: 'public',
+          username: 'test',
+          password: 'test',
         },
-        method: 'get',
+        method: 'GET',
       },
       response: '',
+      error: '',
+      payload: '',
     },
     methods: {
       start: function() {
+        this.error = ''
+        this.response = ''
         $.ajax({
           type: "POST",
           url: vm.host,
@@ -67,10 +98,15 @@
           data: JSON.stringify(vm.data),
           dataType: "json",
           success: function (message) {
-            vm.response = JSON.stringify(message)
+            try {
+              vm.response = JSON.stringify(message, null, 2)
+            } catch (e) {
+              vm.response = message.toString()
+            }
           },
           error: function (message) {
-            console.log(message)
+            console.warn(message)
+            vm.error = message.responseText.toString()
           }
         })
       }
